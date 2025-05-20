@@ -15,7 +15,7 @@ title_font = pygame.font.SysFont("helvetica", 50, bold=True)
 font = pygame.font.SysFont("helvetica", 40)
 
 # Dosyaları otomatik bulma
-def find_music_files(directory="."):
+def find_music_files(directory="songs"):
     music_extensions = ['.mp3', '.wav']
     music_files = [f for f in os.listdir(directory) if f.lower().endswith(tuple(music_extensions))]
     if not music_files:
@@ -82,7 +82,7 @@ cv2.setWindowProperty("Equaliter", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREE
 # Pygame mixer 
 pygame.mixer.init()
 try:
-    pygame.mixer.music.load(songs[selected])
+    pygame.mixer.music.load(os.path.join("songs", songs[selected]))
     pygame.mixer.music.play()
 except Exception as e:
     print(f"Sarki yuklenemedi: {e}")
