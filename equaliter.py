@@ -17,9 +17,14 @@ font = pygame.font.SysFont("helvetica", 40)
 # Dosyaları otomatik bulma
 def find_music_files(directory="songs"):
     music_extensions = ['.mp3', '.wav']
-    music_files = [f for f in os.listdir(directory) if f.lower().endswith(tuple(music_extensions))]
+    music_files = [os.path.join(directory, f) for f in os.listdir(directory) if f.lower().endswith(tuple(music_extensions))]
     if not music_files:
-        return ["Meczup - Can Bonomo.mp3", "İZMİR MARŞI.mp3", "ATABARI.mp3", "ÇÖKERTME.mp3","Delinin Düşü - Can Bonomo.mp3", "Güneş - Can Bonomo.mp3", "Love Me Back - Can Bonomo.mp3", "Rüyamda Buluttum - Can Bonomo.mp3" , "SELANİK TÜRKÜSÜ.mp3" , "Tastamam - Can Bonomo.mp3" ]
+        default_songs = [
+            "Meczup - Can Bonomo.mp3", "İZMİR MARŞI.mp3", "ATABARI.mp3", "ÇÖKERTME.mp3",
+            "Delinin Düşü - Can Bonomo.mp3", "Güneş - Can Bonomo.mp3", "Love Me Back - Can Bonomo.mp3",
+            "Rüyamda Buluttum - Can Bonomo.mp3", "SELANİK TÜRKÜSÜ.mp3", "Tastamam - Can Bonomo.mp3"
+        ]
+        return [os.path.join(directory, f) for f in default_songs]
     return music_files
 
 songs = find_music_files()
@@ -30,17 +35,19 @@ def draw_menu():
     global pulse
     pulse = (pulse + 0.1) % (2 * math.pi)
     scale = 1 + 0.05 * math.sin(pulse)
-    
+
     screen.fill((20, 30, 40))
     title = title_font.render("eQUALİTER", True, (255, 255, 255))
     title = pygame.transform.scale(title, (int(title.get_width() * scale), int(title.get_height() * scale)))
     screen.blit(title, (200 - title.get_width()//2, 20))
-    
-    for i, song in enumerate(songs):
+
+    for i, song_path in enumerate(songs):
+        song_name = os.path.basename(song_path)  # sadece dosya adı
         color = (255, 0, 0) if i == selected else (150, 150, 150)
-        text = font.render(song, True, color)
+        text = font.render(song_name, True, color)
         screen.blit(text, (50, 80 + i * 50))
     pygame.display.flip()
+
 
 # --- Şarkı seçme menüsü ---
 running = True
@@ -82,11 +89,12 @@ cv2.setWindowProperty("Equaliter", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREE
 # Pygame mixer 
 pygame.mixer.init()
 try:
-    pygame.mixer.music.load(os.path.join("songs", songs[selected]))
+    pygame.mixer.music.load(songs[selected])  # artık tam dosya yolu içeriyor
     pygame.mixer.music.play()
 except Exception as e:
     print(f"Sarki yuklenemedi: {e}")
     exit()
+
 
 # --- Görselleştirme sınıfları ---
 class AudioVisualizer:
